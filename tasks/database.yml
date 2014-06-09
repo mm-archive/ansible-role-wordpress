@@ -1,0 +1,35 @@
+---
+# file: wordpress/tasks/database.yml
+
+- name: Create database for each site
+  mysql_db: >
+    name={{ item.db_name | default(item.domain+"_db") }}
+    state=present
+    login_host={{ item.db_host | default(wordpress_default_db_host) }}
+  register: wordpress_db_created
+  with_items: wordpress_sites
+
+- name: Copy saved database to server
+  copy: >
+    src={{ item.item.domain }}.sql
+    dest=/tmp/{{ item.item.domain }}.sql
+  when: item | changed and item.item.restore_saved_db | default(wordpress_default_restore_saved_db)
+  with_items: wordpress_db_created.results
+
+- name: Import saved database
+  mysql_db: >
+    name={{ item.item.db_name | default(item.item.domain+"_db") }}
+    state=import
+    target=/tmp/{{ item.item.domain }}.sql
+    login_host={{ item.item.db_host | default(wordpress_default_db_host) }}
+  when: item | changed and item.item.restore_saved_db | default(wordpress_default_restore_saved_db)
+  with_items: wordpress_db_created.results
+
+- name: Create/assign database user to db and grant permissions
+  mysql_user: >
+    name={{ item.db_user | default(item.domain+"_user")}}
+    password={{ item.db_password | default(lookup('password', wordpress_dir_credentials+'/'+item.domain+'_pw length=25')) }}
+    priv={{ item.db_name | default(item.domain+"_db") }}.*:ALL
+    state=present
+    login_host={{ item.db_host | default(wordpress_default_db_host) }}
+  with_items: wordpress_sites

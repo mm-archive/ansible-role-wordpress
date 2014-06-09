@@ -1,0 +1,23 @@
+---
+# file: wordpress/tasks/dir_setup.yml
+
+- name: Create web root of sites
+  file: >
+    path={{ wordpress_dir_www_root }}/{{ item.domain }}/current/web
+    owner={{ wordpress_user_www }}
+    group={{ wordpress_user_www }}
+    mode={{ wordpress_dir_mode }}
+    state=directory
+  with_items: wordpress_sites
+
+- name: Create shared folder of sites
+  file: path={{ www_root }}/{{ item.site_name }}/shared owner={{ item.user | default(user) }} group=www-data mode=0755 state=directory
+  with_items: wordpress_sites
+
+- name: Create logs folder of sites
+  file: path={{ www_root }}/{{ item.site_name }}/logs owner={{ item.user | default(user) }} group=www-data mode=0755 state=directory
+  with_items: wordpress_sites
+
+- name: Change site owner to user
+  file: path={{ www_root }}/{{ item.site_name }} owner={{ item.user | default(user) }} group=www-data state=directory recurse=yes
+  with_items: wordpress_sites

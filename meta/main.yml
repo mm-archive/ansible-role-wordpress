@@ -1,0 +1,7 @@
+---
+# file: wordpress/meta/main.yml
+
+dependencies:
+  - { role: nginx }
+  - { role: php }
+  - { role: mariadb}
