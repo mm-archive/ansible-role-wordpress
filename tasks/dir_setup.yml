@@ -11,3 +11,10 @@
   with_nestd:
     - wordpress_sites
     - wordpress_dir_structure
+
+- name: Checkout site files
+  git: >
+    repo={{ item.repository }}
+    dest={{ wordpress_dir_www_root }}/{{ item.domain }}
+  with_items:
+    - wordpress_sites

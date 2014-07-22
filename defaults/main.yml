@@ -10,29 +10,18 @@ wordpress_file_mode: '0644'
 wordpress_default_restore_saved_db: false
 wordpress_default_db_host: localhost
 
+# If we want to move the app files down a level
+# and other site folder (eg. /logs)
 wordpress_dir_structure:
-  base:        ''
-  public:      '/public'
-  app:         '/public/app'
-  mu_plugins:  '/public/app/mu-plugins'
-  plugins:     '/public/app/plugins'
-  themes:      '/public/app/themes'
-  uploads:     '/public/app/uploads'
-  wp:          '/public/wp'
-  config:      '/config'
-  vendor:      '/vendor'
+  base:  ''
+# logs:  '/logs'
+# site:  '/site'
 
-wordpress_file_static:
-  - src:   'application.php'
-    dest:  '{{ wordpress_dir_structure.config }}'
-  - src:   'index.php'
-    dest:  '{{ wordpress_dir_structure.public }}'
-  - src:   'wp-config'
-    dest:  '{{ wordpress_dir_structure.public }}'
 
 # Example Site Configuration
 wordpress_sites:
   - domain: example.test
+    repository: git@example.com:user/repo.git
     #db_name: example_db
     #db_user:
     #db_password

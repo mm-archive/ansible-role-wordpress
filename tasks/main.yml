@@ -3,4 +3,4 @@
 
 - include: database.yml
 - include: dir_setup.yml
-- include: files.yml
+- include: nginx.yml
