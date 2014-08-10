@@ -2,6 +2,8 @@
 # file: wordpress/meta/main.yml
 
 dependencies:
-  - { role: nginx }
-  - { role: php }
-  - { role: mariadb}
+  - { role: mi11er.nginx }
+  - { role: mi11er.php }
+  - { role: mi11er.mariadb}
+
+version: 0.1.0

@@ -21,6 +21,8 @@ wordpress_dir_structure:
 # Example Site Configuration
 wordpress_sites:
   - domain: example.test
+    alt_domains:
+      - www.example.text
     repository: git@example.com:user/repo.git
     #db_name: example_db
     #db_user:
