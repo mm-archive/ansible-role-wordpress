@@ -8,7 +8,7 @@
     group={{ wordpress_group_www }}
     mode={{ wordpress_dir_mode }}
     state=directory
-  with_nestd:
+  with_nested:
     - wordpress_sites
     - wordpress_dir_structure
 
