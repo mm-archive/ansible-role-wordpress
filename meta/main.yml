@@ -2,8 +2,20 @@
 # file: wordpress/meta/main.yml
 
 dependencies:
-  - { role: mi11er.nginx }
-  - { role: mi11er.php }
-  - { role: mi11er.mariadb}
+  - { role: MatthewMi11er.nginx }
+  - { role: MatthewMi11er.php }
+  - { role: MatthewMi11er.mariadb}
 
 version: 0.1.0
+galaxy_info:
+  author: Matthew Miller
+  description: A role to setup wordpress
+  company: 
+  license: license (MIT)
+  min_ansible_version: 1.6
+  platforms:
+    - name: Ubuntu
+      versions:
+        - trusty
+  categories:
+    - web
