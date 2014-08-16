@@ -5,8 +5,7 @@ dependencies:
   - { role: MatthewMi11er.nginx }
   - { role: MatthewMi11er.php }
   - { role: MatthewMi11er.mariadb}
-
-version: 0.1.0
+version: 0.9.0
 galaxy_info:
   author: Matthew Miller
   description: A role to setup wordpress
