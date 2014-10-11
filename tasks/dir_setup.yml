@@ -3,18 +3,25 @@
 
 - name: Create directory structure
   file: >
-    path={{ wordpress_dir_www_root }}/{{ item[0].domain }}{{ item[1] }}
-    owner={{ wordpress_user_www }}
-    group={{ wordpress_group_www }}
-    mode={{ wordpress_dir_mode }}
+    path={{ wordpress_site_dir_www_root }}/{{ wordpress_site_name }}{{ item.value.path }}
+    owner={{ wordpress_site_user_www }}
+    group={{ wordpress_site_group_www }}
+    mode={{ wordpress_site_dir_mode }}
     state=directory
-  with_nested:
-    - wordpress_sites
-    - wordpress_dir_structure
+  with_dict: wordpress_dir_structure
+  
+#- name: Copy Deploy Key
+#  copy: >
+#    src={{ wordpress_site_repository_deploy_key }}
+#    dest=~/.ssh/{{ wordpress_site_name }}_deploy
+#    owner=root 
+#    group=root 
+#    mode=0600
 
 - name: Checkout site files
   git: >
-    repo={{ item.repository }}
-    dest={{ wordpress_dir_www_root }}/{{ item.domain }}
-  with_items:
-    - wordpress_sites
+    repo={{ wordpress_site_repository }}
+    dest={{ wordpress_site_dir_www_root }}/{{ wordpress_site_name }}
+    accept_hostkey=true
+    
+    

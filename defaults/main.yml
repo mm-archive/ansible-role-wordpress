@@ -1,53 +1,66 @@
 ---
 # file: wordpress/defaults/main.yml
 
-wordpress_dir_credentials: "{{ inventory_dir }}/_private/credentials"
-wordpress_dir_www_root: /srv/www
-wordpress_user_www: www-data
-wordpress_group_www: www-data
-wordpress_dir_mode: '0755'
-wordpress_file_mode: '0644'
-wordpress_default_restore_saved_db: false
-wordpress_default_db_host: localhost
+wordpress_dir_credentials: "{{ inventory_dir }}/../_private/credentials"
+
 
 # If we want to move the app files down a level
 # and other site folder (eg. /logs)
 wordpress_dir_structure:
-  base:  ''
-# logs:  '/logs'
-# site:  '/site'
+  base:
+    path: ''
+# logs:
+#    path: '/logs'
+# site:
+#    path: '/site'
+
+wordpress_default_admin_password: "{{ lookup('password', wordpress_dir_credentials + '/'+ wordpress_site_name + '.admin_password length=15')  }}"
+wordpress_default_db_password: "{{ lookup('password', wordpress_dir_credentials + '/' + wordpress_site_name + '.db_password length=25') }}"
+wordpress_default_auth_key: "{{ lookup('password', wordpress_dir_credentials + '/' + wordpress_site_name + '.auth_key length=65') }}"
+wordpress_default_secure_auth_key: "{{ lookup('password', wordpress_dir_credentials + '/' + wordpress_site_name + '.secure_auth_key length=65') }}"
+wordpress_default_logged_in_key: "{{ lookup('password', wordpress_dir_credentials + '/' + wordpress_site_name + '.logged_in_key length=65') }}"
+wordpress_default_nonce_key: "{{ lookup('password', wordpress_dir_credentials + '/' + wordpress_site_name + '.nonce_key length=65') }}"
+wordpress_default_auth_salt: "{{ lookup('password', wordpress_dir_credentials + '/' + wordpress_site_name + '.auth_salt length=65') }}"
+wordpress_default_secure_auth_salt: "{{ lookup('password', wordpress_dir_credentials + '/' + wordpress_site_name + '.secure_auth_salt length=65') }}"
+wordpress_default_logged_in_salt: "{{ lookup('password', wordpress_dir_credentials + '/' + wordpress_site_name + '.logged_in_salt length=65') }}"
+wordpress_default_nonce_salt: "{{ lookup('password', wordpress_dir_credentials + '/' + wordpress_site_name + '.nonce_salt length=65') }}"
 
 
-# Example Site Configuration
-wordpress_sites:
-  - domain: example.test
-    alt_domains:
-      - www.example.text
-    repository: git@example.com:user/repo.git
-    #restore_saved_db: false
-    site_install: true
-    site_title: Example Site
-    admin_user: admin
-    admin_password: admin
-    admin_email: admin@example.dev
-    system_cron: true
-    run_composer: true
-    multisite:
-      enabled: false
-    #home: http://example.dev
-    #siteurl: http://example.dev/wp
-    #env: development
-    #db_host: localhost
-    #db_name: example_dev
-    #db_user: example_dbuser
-    #db_password: example_dbpassword
-    #auth_key:
-    #secure_auth_key:
-    #AUTH_KEY:
-    #SECURE_AUTH_KEY:
-    #LOGGED_IN_KEY:
-    #NONCE_KEY:
-    #AUTH_SALT:
-    #SECURE_AUTH_SALT:
-    #LOGGED_IN_SALT:
-    #NONCE_SALT:
+#should be passed into role. Used to over ride default variables
+wordress_site:
+
+wordpress_site_dir_www_root: "{{ wordpress_site.dir_www_root | default('/srv/www') }}"
+wordpress_site_user_www: "{{ wordpress_site.user_www | default('www-data') }}"
+wordpress_site_group_www: "{{ wordpress_site.group_www | default('www-data') }}"
+wordpress_site_dir_mode: "{{ wordpress_site.dir_mode | default('0755') }}"
+wordpress_site_file_mode: "{{ wordpress_site.dir_file | default('0644') }}"  
+
+wordpress_site_name: "{{ wordpress_site.name | default('Example') }}"
+wordpress_site_domain: "{{ wordpress_site.domain | default('example.test') }}"
+wordpress_site_alt_domains: "{{ wordpress_site.alt_domains | default([]) }}"
+wordpress_site_repository: "{{ wordpress_site.repository | default('git@example.com:user/repo.git') }}"
+wordpress_site_repository_deploy_key: "{{ wordpress_site.repoistory_deploy_key | default('') }}"
+wordpress_site_restore_saved_db: "{{ wordpress_site.restore_saved_db | default(false, true) }}"
+wordpress_site_install: "{{ wordpress_site.install | default(true, true) }}"
+wordpress_site_title: "{{ wordpress_site.title | default('Example Site') }}"
+wordpress_site_admin_user: "{{ wordpress_site.admin_user | default('admin') }}"
+wordpress_site_admin_password: "{{ wordpress_site.admin_password | default(wordpress_default_admin_password) }}"
+wordpress_site_admin_email: "{{ wordpress_site.admin_email | default('webmaster@example.test') }}"
+wordpress_site_system_cron: "{{ wordpress_site.system_cron | default(true,true) }}"
+wordpress_site_run_composer: "{{ wordpress_site.run_composer | default(true,true) }}"
+wordpress_site_multisite_enabled: "{{ wordpress_site.multisite_enabled | default(false,true) }}"
+wordpress_site_home: "{{ wordpress_site.home | default('http://'+wordpress_site_domain) }}"
+wordpress_site_url: "{{ wordpress_site.url | default('http://'+wordpress_site_domain+'/wp') }}"
+wordpress_site_env: "{{ wordpress_site.env | default('development') }}"
+wordpress_site_db_host: "{{ wordpress_site.db_host | default('localhost') }}"
+wordpress_site_db_name: "{{ wordpress_site.db_name | default(wordpress_site_name+'_db') }}"
+wordpress_site_db_user: "{{ wordpress_site.db_user | default(wordpress_site_name+'_user') }}"
+wordpress_site_db_password: "{{ wordpress_site.db_password | default(wordpress_default_db_password) }}"
+wordpress_site_auth_key: "{{ wordpress_site.auth_key | default(wordpress_default_auth_key) }}"
+wordpress_site_secure_auth_key: "{{ wordpress_site.secure_auth_key | default(wordpress_default_secure_auth_key) }}"
+wordpress_site_logged_in_key: "{{ wordpress_site.logged_in_key | default(wordpress_default_logged_in_key) }}"
+wordpress_site_nonce_key: "{{ wordpress_site.nonce_key | default(wordpress_default_nonce_key) }}"
+wordpress_site_auth_salt: "{{ wordpress_site.auth_salt | default(wordpress_default_auth_salt) }}"
+wordpress_site_secure_auth_salt: "{{ wordpress_site.secure_auth_salt | default(wordpress_default_secure_auth_salt) }}"
+wordpress_site_logged_in_salt: "{{ wordpress_site.logged_in_salt | default(wordpress_default_logged_in_salt) }}"
+wordpress_site_nonce_salt: "{{ wordpress_site.nonce_salt | default(wordpress_default_nonce_salt) }}"

@@ -4,7 +4,8 @@
 dependencies:
   - { role: MatthewMi11er.nginx }
   - { role: MatthewMi11er.php }
-  - { role: MatthewMi11er.mariadb}
+  - { role: MatthewMi11er.mariadb }
+  - { role: MatthewMi11er.wpcli }
 version: 0.9.0
 galaxy_info:
   author: Matthew Miller
