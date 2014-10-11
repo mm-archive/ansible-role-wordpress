@@ -7,57 +7,51 @@
 
 - name: Install Dependencies with Composer
   composer: >
-    install
-    working_dir={{ wordpress_dir_www_root }}/{{ item.domain }}
-  with_items: wordpress_sites
-  when: item.run_composer|default(False) == True
+    working_dir='{{ wordpress_site_dir_www_root }}/{{ wordpress_site_name }}'
+  when: wordpress_site_run_composer
 
 - name: WP installed?
   command: >
     wp core is-installed
-    --allow-root chdir={{ wordpress_dir_www_root }}/{{ item.domain }}
-  register: site_statuses
+    --allow-root chdir={{ wordpress_site_dir_www_root }}/{{ wordpress_site_name }}
+  register: wordpress_site_status
   ignore_errors: True
-  with_items: wordpress_sites
 
 - name: Install WP
   command: >
     wp core install
     --allow-root
-    --url='{{ item.item.home | default("http://"+item.item.domain) }}'
-    --title='{{ item.item.site_title | default("") }}'
-    --admin_user='{{ item.item.admin_user }}'
-    --admin_password='{{ item.item.admin_password }}'
-    --admin_email='{{ item.item.admin_email }}'
+    --url='{{ wordpress_site_home }}'
+    --title='{{ wordpress_site_title }}'
+    --admin_user='{{ wordpress_site_admin_user }}'
+    --admin_password='{{ wordpress_site_admin_password }}'
+    --admin_email='{{ wordpress_site_admin_email }}'
   args:
-    chdir: "{{ wordpress_dir_www_root }}/{{ item.item.site_name }}/"
-  with_items: site_statuses.results
-  when: item.rc == 1 and item.item.site_install == True and item.item.multisite.enabled|default(False) == False
+    chdir: "{{ wordpress_dir_www_root }}/{{ wordpress_site_name }}/"
+  when: wordpress_site_status.rc == 1 and wordpress_site_install == True and wordpress_site_multisite_enabled == False
   notify: reload nginx
 
 - name: Install WP Multisite
   command: >
     wp core multisite-install
     --allow-root
-    --url='{{ item.item.home | default("http://"+item.item.domain) }}'
-    --base='{{ item.item.multisite.base_path | default('/') }}'
-    --subdomains='{{ item.item.multisite.subdomains | default('false') }}'
-    --title='{{ item.item.site_title | default(item.item.site_name) }}'
-    --admin_user='{{ item.item.admin_user }}'
-    --admin_password='{{ item.item.admin_password }}'
-    --admin_email='{{ item.item.admin_email }}'
+    --url='{{ wordpress_site_home  }}'
+    --base='{{ iwordpress_site_multisite_base_path }}'
+    --subdomains='{{ wordpress_site_multisite_subdomains }}'
+    --title='{{ wordpress_site_site_title }}'
+    --admin_user='{{ wordpress_site_admin_user }}'
+    --admin_password='{{ wordpress_site_admin_password }}'
+    --admin_email='{{ wordpress_site_admin_email }}'
   args:
-    chdir: "{{ wordpress_dir_www_root }}/{{ item.item.site_name }}/current/"
-  with_items: site_statuses.results
-  when: item.rc == 1 and item.item.site_install == True and item.item.multisite.enabled|default(False) == True
-  notify: reload nginx
+    chdir: "{{ wordpress_site_dir_www_root }}/{{ wordpress_site_name }}/current/"
+  when: wordpress_site_status.rc == 1 and wordpress_site_install == True and wordpress_site_multisite_enabled == True
+  notify: Reload Nginx
 
 - name: Setup system cron
   cron: >
-    name='{{ item.domain }} WordPress cron'
+    name='{{ wordpress_site_name }} WordPress cron'
     minute='*/15'
-    user={{ wordpress_user_www }}
-    job='curl -s {{ item.home | default("http://"+item.domain) }}/wp-cron.php'
-    cron_file=wordpress_{{ item.domain }}
-  with_items: wordpress_sites
-  when: item.system_cron|default(False) == True
+    user='{{ wordpress_site_user_www }}'
+    job='curl -s {{ wordpress_site_home }}/wp-cron.php'
+    cron_file='wordpress_{{ wordpress_site_name }}'
+  when: wordpress_site_system_cron

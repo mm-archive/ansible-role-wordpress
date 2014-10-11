@@ -4,20 +4,17 @@
 - name: Create Nginx configuration for Wordpress site
   template: >
     src=wordpress-site.conf
-    dest={{ nginx_root }}/sites-available/{{ item.domain }}
-  with_items: wordpress_sites
+    dest={{ nginx_root }}/sites-available/{{ wordpress_site_name }}
 
 - name: Enable WordPress site
   file: >
-    src={{ nginx_root }}/sites-available/{{ item.domain }}
-    dest={{ nginx_root }}/sites-enabled/{{ item.domain }}
+    src={{ nginx_root }}/sites-available/{{ wordpress_site_name }}
+    dest={{ nginx_root }}/sites-enabled/{{ wordpress_site_name }}
     state=link
-  with_items: wordpress_sites
   notify: Reload Nginx
 
 - name: Create Php-FPM configuration
   template: >
     src=php-fpm.conf
-    dest={{ php_dir_pool }}/{{ item.site_name }}.conf
-  with_items: wordpress_sites
+    dest={{ php_dir_pool }}/{{ wordpress_site_name }}.conf
   notify: Restart Php5-fpm
