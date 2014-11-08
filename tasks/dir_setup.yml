@@ -1,6 +1,12 @@
 ---
 # file: wordpress/tasks/dir_setup.yml
 
+- name: Checkout site files
+  git: >
+    repo={{ wordpress_site_repository }}
+    dest={{ wordpress_site_dir_www_root }}/{{ wordpress_site_name }}
+    accept_hostkey=true
+      
 - name: Create directory structure
   file: >
     path={{ wordpress_site_dir_www_root }}/{{ wordpress_site_name }}{{ item.value.path }}
@@ -35,11 +41,5 @@
   template: >
     src=.env
     dest={{ wordpress_site_dir_www_root }}/{{ wordpress_site_name }}/.env
-    
-- name: Checkout site files
-  git: >
-    repo={{ wordpress_site_repository }}
-    dest={{ wordpress_site_dir_www_root }}/{{ wordpress_site_name }}
-    accept_hostkey=true
     
     
