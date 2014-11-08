@@ -1,5 +1,6 @@
 ---
 # file: wordpress/defaults/main.yml
+test: '{{ wordpress_site_multisite_enabled and wordpress_site_install }}'
 
 wordpress_dir_credentials: "{{ inventory_dir }}/../_private/credentials"
 
@@ -9,6 +10,22 @@ wordpress_dir_credentials: "{{ inventory_dir }}/../_private/credentials"
 wordpress_dir_structure:
   base:
     path: ''
+  web_root:
+    path: '/public'
+  app_root:
+    path: '/public/app'
+  mupligins:
+    path: '/public/app/mu-plugins'
+  plugins:
+    path: '/public/app/plugins'
+  themes: 
+    path: '/public/app/themes'
+  uploads:
+    path: '/public/app/uploads'
+  config:
+    path: '/config'
+
+    
 # logs:
 #    path: '/logs'
 # site:
@@ -40,15 +57,15 @@ wordpress_site_domain: "{{ wordpress_site.domain | default('example.test') }}"
 wordpress_site_alt_domains: "{{ wordpress_site.alt_domains | default([]) }}"
 wordpress_site_repository: "{{ wordpress_site.repository | default('git@example.com:user/repo.git') }}"
 wordpress_site_repository_deploy_key: "{{ wordpress_site.repoistory_deploy_key | default('') }}"
-wordpress_site_restore_saved_db: "{{ wordpress_site.restore_saved_db | default(false, true) }}"
-wordpress_site_install: "{{ wordpress_site.install | default(true, true) }}"
+wordpress_site_restore_saved_db: "{{ wordpress_site.restore_saved_db | default(false) }}"
+wordpress_site_install: "{{ wordpress_site.install | default(true) }}"
 wordpress_site_title: "{{ wordpress_site.title | default('Example Site') }}"
 wordpress_site_admin_user: "{{ wordpress_site.admin_user | default('admin') }}"
 wordpress_site_admin_password: "{{ wordpress_site.admin_password | default(wordpress_default_admin_password) }}"
 wordpress_site_admin_email: "{{ wordpress_site.admin_email | default('webmaster@example.test') }}"
-wordpress_site_system_cron: "{{ wordpress_site.system_cron | default(true,true) }}"
-wordpress_site_run_composer: "{{ wordpress_site.run_composer | default(true,true) }}"
-wordpress_site_multisite_enabled: "{{ wordpress_site.multisite_enabled | default(false,true) }}"
+wordpress_site_system_cron: "{{ wordpress_site.system_cron | default(true) }}"
+wordpress_site_run_composer: "{{ wordpress_site.run_composer | default(true) }}"
+wordpress_site_multisite_enabled: "{{ wordpress_site.multisite_enabled | default(false) }}"
 wordpress_site_home: "{{ wordpress_site.home | default('http://'+wordpress_site_domain) }}"
 wordpress_site_url: "{{ wordpress_site.url | default('http://'+wordpress_site_domain+'/wp') }}"
 wordpress_site_env: "{{ wordpress_site.env | default('development') }}"

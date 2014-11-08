@@ -1,6 +1,12 @@
 ---
 # file: wordpress/tasks/dir_setup.yml
 
+- name: Checkout site files
+  git: >
+    repo={{ wordpress_site_repository }}
+    dest={{ wordpress_site_dir_www_root }}/{{ wordpress_site_name }}
+    accept_hostkey=true
+      
 - name: Create directory structure
   file: >
     path={{ wordpress_site_dir_www_root }}/{{ wordpress_site_name }}{{ item.value.path }}
@@ -10,18 +16,30 @@
     state=directory
   with_dict: wordpress_dir_structure
   
-#- name: Copy Deploy Key
-#  copy: >
-#    src={{ wordpress_site_repository_deploy_key }}
-#    dest=~/.ssh/{{ wordpress_site_name }}_deploy
-#    owner=root 
-#    group=root 
-#    mode=0600
-
-- name: Checkout site files
-  git: >
-    repo={{ wordpress_site_repository }}
-    dest={{ wordpress_site_dir_www_root }}/{{ wordpress_site_name }}
-    accept_hostkey=true
+- name: Copy application files to server
+  copy: >
+    src={{ item.src }} 
+    dest={{ wordpress_site_dir_www_root }}/{{ wordpress_site_name }}{{ item.dest }}
+  with_items:
+    - src: 'public_index.php'
+      dest: '/public/index.php'
+    - src: 'public_wp-config.php'
+      dest: '/public/wp-config.php'
+    - src: 'wp-cli.yml'
+      dest: '/wp-cli.yml'
+    - src: 'muplugin_register-theme-directory.php'
+      dest: '/public/app/mu-plugins/regsiter-theme-directory.php'
+    - src: 'muplugin_disallow-indexing.php'
+      dest: '/public/app/mu-plugins/disallow-indexing.php'
+    - src: 'muplugin_bedrock-autoloader.php'
+      dest: '/public/app/mu-plugins/bedrock-autoloader.php'
+    - src: 'config_application.php'
+      dest: '/config/application.php'
+      
+        
+- name: Generate environament variables file
+  template: >
+    src=.env
+    dest={{ wordpress_site_dir_www_root }}/{{ wordpress_site_name }}/.env
     
     

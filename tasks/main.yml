@@ -8,12 +8,14 @@
 - name: Install Dependencies with Composer
   composer: >
     working_dir='{{ wordpress_site_dir_www_root }}/{{ wordpress_site_name }}'
-  when: wordpress_site_run_composer
+  when: wordpress_site_run_composer|bool
 
 - name: WP installed?
   command: >
     wp core is-installed
-    --allow-root chdir={{ wordpress_site_dir_www_root }}/{{ wordpress_site_name }}
+    --allow-root 
+  args:
+    chdir: "{{ wordpress_site_dir_www_root }}/{{ wordpress_site_name }}"
   register: wordpress_site_status
   ignore_errors: True
 
@@ -27,16 +29,16 @@
     --admin_password='{{ wordpress_site_admin_password }}'
     --admin_email='{{ wordpress_site_admin_email }}'
   args:
-    chdir: "{{ wordpress_dir_www_root }}/{{ wordpress_site_name }}/"
-  when: wordpress_site_status.rc == 1 and wordpress_site_install == True and wordpress_site_multisite_enabled == False
-  notify: reload nginx
-
+    chdir: "{{ wordpress_site_dir_www_root }}/{{ wordpress_site_name }}/"
+  when: wordpress_site_status.rc|int == 1 and wordpress_site_install|bool and not wordpress_site_multisite_enabled|bool
+  notify: Reload Nginx
+  
 - name: Install WP Multisite
   command: >
     wp core multisite-install
     --allow-root
     --url='{{ wordpress_site_home  }}'
-    --base='{{ iwordpress_site_multisite_base_path }}'
+    --base='{{ wordpress_site_multisite_base_path }}'
     --subdomains='{{ wordpress_site_multisite_subdomains }}'
     --title='{{ wordpress_site_site_title }}'
     --admin_user='{{ wordpress_site_admin_user }}'
@@ -44,7 +46,7 @@
     --admin_email='{{ wordpress_site_admin_email }}'
   args:
     chdir: "{{ wordpress_site_dir_www_root }}/{{ wordpress_site_name }}/current/"
-  when: wordpress_site_status.rc == 1 and wordpress_site_install == True and wordpress_site_multisite_enabled == True
+  when: wordpress_site_status.rc|int == 1 and wordpress_site_install|bool and wordpress_site_multisite_enabled|bool
   notify: Reload Nginx
 
 - name: Setup system cron
@@ -54,4 +56,4 @@
     user='{{ wordpress_site_user_www }}'
     job='curl -s {{ wordpress_site_home }}/wp-cron.php'
     cron_file='wordpress_{{ wordpress_site_name }}'
-  when: wordpress_site_system_cron
+  when: wordpress_site_system_cron|bool

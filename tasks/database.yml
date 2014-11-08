@@ -12,7 +12,7 @@
   copy: >
     src={{ wordpress_site_name }}.sql
     dest=/tmp/{{ wordpress_site_name }}.sql
-  when: wordpress_site_restore_saved_db
+  when: wordpress_site_restore_saved_db|bool
 
 - name: Import saved database
   mysql_db: >
@@ -20,7 +20,7 @@
     state=import
     target=/tmp/{{ wordpress_site_name }}.sql
     login_host={{ wordpress_site_db_host }}
-  when: wordpress_site_restore_saved_db
+  when: wordpress_site_restore_saved_db|bool
 
 - name: Create/assign database user to db and grant permissions
   mysql_user: >
