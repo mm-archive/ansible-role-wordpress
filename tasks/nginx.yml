@@ -5,6 +5,7 @@
   template: >
     src=wordpress-site.conf
     dest={{ nginx_root }}/sites-available/{{ wordpress_site_name }}
+  notify: Reload Nginx
 
 - name: Enable WordPress site
   file: >
