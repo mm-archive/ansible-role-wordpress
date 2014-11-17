@@ -48,6 +48,8 @@ wordress_site:
 
 wordpress_site_dir_www_root: "{{ wordpress_site.dir_www_root | default('/srv/www') }}"
 wordpress_site_user_www: "{{ wordpress_site.user_www | default('www-data') }}"
+wordpress_site_forward_system_mail: "{{ wordpress_site.forward_system_mail | default(false) }}"
+wordpress_site_forward_address: "{{ wordpress_site.forward_address | default('webmaster@'+wordpress_site_domain)}}"
 wordpress_site_group_www: "{{ wordpress_site.group_www | default('www-data') }}"
 wordpress_site_dir_mode: "{{ wordpress_site.dir_mode | default('0755') }}"
 wordpress_site_file_mode: "{{ wordpress_site.dir_file | default('0644') }}"  
@@ -82,3 +84,4 @@ wordpress_site_auth_salt: "{{ wordpress_site.auth_salt | default(wordpress_defau
 wordpress_site_secure_auth_salt: "{{ wordpress_site.secure_auth_salt | default(wordpress_default_secure_auth_salt) }}"
 wordpress_site_logged_in_salt: "{{ wordpress_site.logged_in_salt | default(wordpress_default_logged_in_salt) }}"
 wordpress_site_nonce_salt: "{{ wordpress_site.nonce_salt | default(wordpress_default_nonce_salt) }}"
+

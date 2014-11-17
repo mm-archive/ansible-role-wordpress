@@ -2,10 +2,10 @@
 # file: wordpress/meta/main.yml
 
 dependencies:
-  - { role: MatthewMi11er.nginx }
-  - { role: MatthewMi11er.php }
-  - { role: MatthewMi11er.mariadb }
-  - { role: MatthewMi11er.wpcli }
+  - MatthewMi11er.nginx
+  - MatthewMi11er.php
+  - MatthewMi11er.mariadb
+  - MatthewMi11er.wpcli
 version: 0.9.0
 galaxy_info:
   author: Matthew Miller

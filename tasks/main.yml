@@ -54,6 +54,22 @@
     name='{{ wordpress_site_name }} WordPress cron'
     minute='*/15'
     user='{{ wordpress_site_user_www }}'
-    job='curl -s {{ wordpress_site_home }}/wp-cron.php'
+    job='curl -s {{ wordpress_site_url }}/wp-cron.php'
     cron_file='wordpress_{{ wordpress_site_name }}'
   when: wordpress_site_system_cron|bool
+  
+- name: Forward Email for user
+  lineinfile: >
+    dest=/etc/aliases
+    regexp='^{{ wordpress_site_user_www }}:'
+    line='{{ wordpress_site_user_www }}: {{ wordpress_site_forward_address }}'
+  when: wordpress_site_forward_system_mail|bool
+  notify: Newaliases
+
+- name: Remove forwarding
+  lineinfile: >
+    dest=/etc/aliases
+    regexp='^{{ wordpress_site_user_www }}:'
+    state='absent'
+  when: not wordpress_site_forward_system_mail|bool
+  notify: Newaliases  
