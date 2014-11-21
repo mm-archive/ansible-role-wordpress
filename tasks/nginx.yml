@@ -8,6 +8,8 @@
   when: wordpress_site_https
   notify:
     - Reload Nginx
+  tags:
+    - wordpress
     
 - name: Copy Private Key
   copy:
@@ -16,22 +18,30 @@
   when: wordpress_site_https
   notify:
     - Reload Nginx
-
+  tags:
+    - wordpress
+    
 - name: Create Nginx configuration for Wordpress site
   template: >
     src=wordpress-site.conf
     dest={{ nginx_root }}/sites-available/{{ wordpress_site_name }}
   notify: Reload Nginx
-
+  tags:
+    - wordpress
+    
 - name: Enable WordPress site
   file: >
     src={{ nginx_root }}/sites-available/{{ wordpress_site_name }}
     dest={{ nginx_root }}/sites-enabled/{{ wordpress_site_name }}
     state=link
   notify: Reload Nginx
-
+  tags:
+    - wordpress
+    
 - name: Create Php-FPM configuration
   template: >
     src=php-fpm.conf
     dest={{ php_dir_pool }}/{{ wordpress_site_name }}.conf
   notify: Restart Php5-fpm
+  tags:
+    - wordpress

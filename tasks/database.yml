@@ -7,12 +7,16 @@
     state=present
     login_host={{ wordpress_site_db_host }}
   register: wordpress_db_created
+  tags:
+    - wordpress
 
 - name: Copy saved database to server
   copy: >
     src={{ wordpress_site_name }}.sql
     dest=/tmp/{{ wordpress_site_name }}.sql
   when: wordpress_site_restore_saved_db|bool
+  tags:
+    - wordpress
 
 - name: Import saved database
   mysql_db: >
@@ -21,6 +25,8 @@
     target=/tmp/{{ wordpress_site_name }}.sql
     login_host={{ wordpress_site_db_host }}
   when: wordpress_site_restore_saved_db|bool
+  tags:
+    - wordpress
 
 - name: Create/assign database user to db and grant permissions
   mysql_user: >
@@ -29,3 +35,5 @@
     priv='{{ wordpress_site_db_name }}.*:ALL'
     state=present
     login_host={{ wordpress_site_db_host }}
+    tags:
+      - wordpress

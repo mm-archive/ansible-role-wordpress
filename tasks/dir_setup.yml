@@ -6,6 +6,8 @@
     repo={{ wordpress_site_repository }}
     dest={{ wordpress_site_dir_www_root }}/{{ wordpress_site_name }}
     accept_hostkey=true
+  tags:
+    - wordpress
       
 - name: Create directory structure
   file: >
@@ -15,6 +17,8 @@
     mode={{ wordpress_site_dir_mode }}
     state=directory
   with_dict: wordpress_dir_structure
+  tags:
+    - wordpress
   
 - name: Copy application files to server
   copy: >
@@ -35,11 +39,13 @@
       dest: '/public/app/mu-plugins/bedrock-autoloader.php'
     - src: 'config_application.php'
       dest: '/config/application.php'
-      
+  tags:
+    - wordpress
         
 - name: Generate environament variables file
   template: >
     src=.env
     dest={{ wordpress_site_dir_www_root }}/{{ wordpress_site_name }}/.env
-    
+  tags:
+    - wordpress
     

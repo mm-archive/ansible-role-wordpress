@@ -9,6 +9,8 @@
   composer: >
     working_dir='{{ wordpress_site_dir_www_root }}/{{ wordpress_site_name }}'
   when: wordpress_site_run_composer|bool
+  tags:
+    - wordpress
 
 - name: WP installed?
   command: >
@@ -18,6 +20,9 @@
     chdir: "{{ wordpress_site_dir_www_root }}/{{ wordpress_site_name }}"
   register: wordpress_site_status
   ignore_errors: True
+  changed_when: false
+  tags:
+    - wordpress
 
 - name: Install WP
   command: >
@@ -32,6 +37,8 @@
     chdir: "{{ wordpress_site_dir_www_root }}/{{ wordpress_site_name }}/"
   when: wordpress_site_status.rc|int == 1 and wordpress_site_install|bool and not wordpress_site_multisite_enabled|bool
   notify: Reload Nginx
+  tags:
+    - wordpress
   
 - name: Install WP Multisite
   command: >
@@ -48,6 +55,8 @@
     chdir: "{{ wordpress_site_dir_www_root }}/{{ wordpress_site_name }}/current/"
   when: wordpress_site_status.rc|int == 1 and wordpress_site_install|bool and wordpress_site_multisite_enabled|bool
   notify: Reload Nginx
+  tags:
+    - wordpress
 
 - name: Setup system cron
   cron: >
@@ -57,6 +66,8 @@
     job='curl -s {{ wordpress_site_url }}/wp-cron.php'
     cron_file='wordpress_{{ wordpress_site_name }}'
   when: wordpress_site_system_cron|bool
+  tags:
+    - wordpress
   
 - name: Forward Email for user
   lineinfile: >
@@ -65,6 +76,8 @@
     line='{{ wordpress_site_user_www }}: {{ wordpress_site_forward_address }}'
   when: wordpress_site_forward_system_mail|bool
   notify: Newaliases
+  tags:
+    - wordpress
 
 - name: Remove forwarding
   lineinfile: >
@@ -73,3 +86,5 @@
     state='absent'
   when: not wordpress_site_forward_system_mail|bool
   notify: Newaliases  
+  tags:
+    - wordpress

@@ -69,7 +69,7 @@ wordpress_site_admin_email: "{{ wordpress_site.admin_email | default('webmaster@
 wordpress_site_system_cron: "{{ wordpress_site.system_cron | default(true) }}"
 wordpress_site_run_composer: "{{ wordpress_site.run_composer | default(true) }}"
 wordpress_site_multisite_enabled: "{{ wordpress_site.multisite_enabled | default(false) }}"
-wordpress_site_home: "{{ wordpress_site.home | default('wordpress_site_url_scheme+wordpress_site_domain) }}"
+wordpress_site_home: "{{ wordpress_site.home | default(wordpress_site_url_scheme+wordpress_site_domain) }}"
 wordpress_site_url: "{{ wordpress_site.url | default(wordpress_site_url_scheme+wordpress_site_domain+'/wp') }}"
 wordpress_site_env: "{{ wordpress_site.env | default('development') }}"
 wordpress_site_db_host: "{{ wordpress_site.db_host | default('localhost') }}"
