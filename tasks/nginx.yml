@@ -1,6 +1,22 @@
 ---
 # file: wordpress/tasks/nginx.yml
 
+- name: Copy Public Key
+  copy: 
+    content: '{{ wordpress_site_public_key }}'
+    dest: '{{ nginx_root }}/certs/{{ wordpress_site_name }}.pem'
+  when: wordpress_site_https
+  notify:
+    - Reload Nginx
+    
+- name: Copy Private Key
+  copy:
+    content: '{{ wordpress_site_private_key }}'
+    dest: '{{ nginx_root }}/certs/{{ wordpress_site_name }}-key.pem'
+  when: wordpress_site_https
+  notify:
+    - Reload Nginx
+
 - name: Create Nginx configuration for Wordpress site
   template: >
     src=wordpress-site.conf
