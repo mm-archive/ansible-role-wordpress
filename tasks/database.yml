@@ -35,5 +35,5 @@
     priv='{{ wordpress_site_db_name }}.*:ALL'
     state=present
     login_host={{ wordpress_site_db_host }}
-    tags:
-      - wordpress
+  tags:
+    - wordpress
