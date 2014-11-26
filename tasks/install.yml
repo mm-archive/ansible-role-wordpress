@@ -1,0 +1,45 @@
+- name: WP installed?
+  command: >
+    wp core is-installed
+    --allow-root 
+  args:
+    chdir: "{{ wordpress_site_dir_www_root }}/{{ wordpress_site_name }}"
+  register: wordpress_site_status
+  ignore_errors: True
+  changed_when: false
+  tags:
+    - wordpress
+
+- name: Install WP
+  command: >
+    wp core install
+    --allow-root
+    --url='{{ wordpress_site_home }}'
+    --title='{{ wordpress_site_title }}'
+    --admin_user='{{ wordpress_site_admin_user }}'
+    --admin_password='{{ wordpress_site_admin_password }}'
+    --admin_email='{{ wordpress_site_admin_email }}'
+  args:
+    chdir: "{{ wordpress_site_dir_www_root }}/{{ wordpress_site_name }}/"
+  when: wordpress_site_status.rc|int == 1 and wordpress_site_install|bool and not wordpress_site_multisite_enabled|bool
+  notify: Reload Nginx
+  tags:
+    - wordpress
+  
+- name: Install WP Multisite
+  command: >
+    wp core multisite-install
+    --allow-root
+    --url='{{ wordpress_site_home  }}'
+    --base='{{ wordpress_site_multisite_base_path }}'
+    --subdomains='{{ wordpress_site_multisite_subdomains }}'
+    --title='{{ wordpress_site_site_title }}'
+    --admin_user='{{ wordpress_site_admin_user }}'
+    --admin_password='{{ wordpress_site_admin_password }}'
+    --admin_email='{{ wordpress_site_admin_email }}'
+  args:
+    chdir: "{{ wordpress_site_dir_www_root }}/{{ wordpress_site_name }}/current/"
+  when: wordpress_site_status.rc|int == 1 and wordpress_site_install|bool and wordpress_site_multisite_enabled|bool
+  notify: Reload Nginx
+  tags:
+    - wordpress

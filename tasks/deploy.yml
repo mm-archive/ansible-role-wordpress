@@ -1,0 +1,6 @@
+- name: Install Dependencies with Composer
+  composer: >
+    working_dir='{{ wordpress_site_dir_www_root }}/{{ wordpress_site_name }}'
+  when: wordpress_site_run_composer|bool
+  tags:
+    - wordpress

@@ -1,90 +1,54 @@
 ---
 # file: wordpress/tasks/main.yml
+- name: Backup Wordpress
+  include: backup.yml
+  tags:
+    - wordpress
+    - wordpress_backup
+    
+- name: Setup Base Directories
+  include: directories.yml
+  tags:
+    - wordpress
+    - wordpress_directories
+    
+- name: Create or Restore Site Database
+  include: database.yml
+  tags:
+    - wordpress
+    - wordpress_database
 
-- include: database.yml
-- include: dir_setup.yml
-- include: nginx.yml
+- name: Deploy Site Source Files
+  include: deploy.yml
+  tags:
+    - wordpress
+    - wordpress_deploy
 
-- name: Install Dependencies with Composer
-  composer: >
-    working_dir='{{ wordpress_site_dir_www_root }}/{{ wordpress_site_name }}'
-  when: wordpress_site_run_composer|bool
-  tags:
-    - wordpress
 
-- name: WP installed?
-  command: >
-    wp core is-installed
-    --allow-root 
-  args:
-    chdir: "{{ wordpress_site_dir_www_root }}/{{ wordpress_site_name }}"
-  register: wordpress_site_status
-  ignore_errors: True
-  changed_when: false
+- name: Install or Update Wordpress
+  include: install.yml
+  tags: 
+    - wordpress
+    - wordpress_install
+    
+- name: Install or Update Wordpress Plugins
+  include: plugins.yml
   tags:
     - wordpress
+    - wordpress_plugins
+    
+- name: Configure Site with Nginx
+  inlude: nginx.yml
+  tags:
+    - wordpress
+    - wordpress_nginx
 
-- name: Install WP
-  command: >
-    wp core install
-    --allow-root
-    --url='{{ wordpress_site_home }}'
-    --title='{{ wordpress_site_title }}'
-    --admin_user='{{ wordpress_site_admin_user }}'
-    --admin_password='{{ wordpress_site_admin_password }}'
-    --admin_email='{{ wordpress_site_admin_email }}'
-  args:
-    chdir: "{{ wordpress_site_dir_www_root }}/{{ wordpress_site_name }}/"
-  when: wordpress_site_status.rc|int == 1 and wordpress_site_install|bool and not wordpress_site_multisite_enabled|bool
-  notify: Reload Nginx
+- name: Configure System Settings
+  include: system.yml
   tags:
     - wordpress
-  
-- name: Install WP Multisite
-  command: >
-    wp core multisite-install
-    --allow-root
-    --url='{{ wordpress_site_home  }}'
-    --base='{{ wordpress_site_multisite_base_path }}'
-    --subdomains='{{ wordpress_site_multisite_subdomains }}'
-    --title='{{ wordpress_site_site_title }}'
-    --admin_user='{{ wordpress_site_admin_user }}'
-    --admin_password='{{ wordpress_site_admin_password }}'
-    --admin_email='{{ wordpress_site_admin_email }}'
-  args:
-    chdir: "{{ wordpress_site_dir_www_root }}/{{ wordpress_site_name }}/current/"
-  when: wordpress_site_status.rc|int == 1 and wordpress_site_install|bool and wordpress_site_multisite_enabled|bool
-  notify: Reload Nginx
-  tags:
-    - wordpress
+    - wordpress_system
 
-- name: Setup system cron
-  cron: >
-    name='{{ wordpress_site_name }} WordPress cron'
-    minute='*/15'
-    user='{{ wordpress_site_user_www }}'
-    job='curl -s {{ wordpress_site_url }}/wp-cron.php'
-    cron_file='wordpress_{{ wordpress_site_name }}'
-  when: wordpress_site_system_cron|bool
-  tags:
-    - wordpress
-  
-- name: Forward Email for user
-  lineinfile: >
-    dest=/etc/aliases
-    regexp='^{{ wordpress_site_user_www }}:'
-    line='{{ wordpress_site_user_www }}: {{ wordpress_site_forward_address }}'
-  when: wordpress_site_forward_system_mail|bool
-  notify: Newaliases
-  tags:
-    - wordpress
 
-- name: Remove forwarding
-  lineinfile: >
-    dest=/etc/aliases
-    regexp='^{{ wordpress_site_user_www }}:'
-    state='absent'
-  when: not wordpress_site_forward_system_mail|bool
-  notify: Newaliases  
-  tags:
-    - wordpress
+
+
