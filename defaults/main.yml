@@ -1,29 +1,15 @@
 ---
 # file: wordpress/defaults/main.yml
-test: '{{ wordpress_site_multisite_enabled and wordpress_site_install }}'
-
 wordpress_dir_credentials: "{{ inventory_dir }}/../_private/credentials"
 
-
+wordpress_release: current
 # If we want to move the app files down a level
 # and other site folder (eg. /logs)
 wordpress_dir_structure:
   base:
     path: ''
-  web_root:
-    path: '/public'
-  app_root:
-    path: '/public/app'
-  mupligins:
-    path: '/public/app/mu-plugins'
-  plugins:
-    path: '/public/app/plugins'
-  themes: 
-    path: '/public/app/themes'
-  uploads:
-    path: '/public/app/uploads'
-  config:
-    path: '/config'
+  release:
+    path: '{{ wordpress_release }}'
 
     
 # logs:
