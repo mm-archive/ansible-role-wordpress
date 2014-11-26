@@ -1,3 +1,9 @@
+- name: Checkout site files
+  git: >
+    repo={{ wordpress_site_repository }}
+    dest={{ wordpress_site_dir_www_root }}/{{ wordpress_site_name }}
+    accept_hostkey=true
+
 - name: Install Dependencies with Composer
   composer: >
     working_dir='{{ wordpress_site_dir_www_root }}/{{ wordpress_site_name }}'

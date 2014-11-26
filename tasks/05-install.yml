@@ -1,3 +1,8 @@
+- name: Generate environament variables file
+  template: >
+    src=.env
+    dest={{ wordpress_site_dir_www_root }}/{{ wordpress_site_name }}/.env
+
 - name: WP installed?
   command: >
     wp core is-installed

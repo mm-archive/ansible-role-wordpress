@@ -1,50 +1,50 @@
 ---
 # file: wordpress/tasks/main.yml
+- name: Setup Base Directories
+  include: 01-directories.yml
+  tags:
+    - wordpress
+    - wordpress_directories
+
+
 - name: Backup Wordpress
-  include: backup.yml
+  include: 02-backup.yml
   tags:
     - wordpress
     - wordpress_backup
     
-- name: Setup Base Directories
-  include: directories.yml
-  tags:
-    - wordpress
-    - wordpress_directories
-    
 - name: Create or Restore Site Database
-  include: database.yml
+  include: 03-database.yml
   tags:
     - wordpress
     - wordpress_database
-
+  
 - name: Deploy Site Source Files
-  include: deploy.yml
+  include: 04-deploy.yml
   tags:
     - wordpress
     - wordpress_deploy
 
-
 - name: Install or Update Wordpress
-  include: install.yml
+  include: 05-install.yml
   tags: 
     - wordpress
     - wordpress_install
     
 - name: Install or Update Wordpress Plugins
-  include: plugins.yml
+  include: 06-plugins.yml
   tags:
     - wordpress
     - wordpress_plugins
     
 - name: Configure Site with Nginx
-  inlude: nginx.yml
+  inlude: 07-nginx.yml
   tags:
     - wordpress
     - wordpress_nginx
 
 - name: Configure System Settings
-  include: system.yml
+  include: 08-system.yml
   tags:
     - wordpress
     - wordpress_system
