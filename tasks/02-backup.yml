@@ -1,2 +1,6 @@
 ---
 # file: wordpress/tasks/backup.yml
+
+- name: Backup Database
+  command: wp db export
+    

@@ -9,13 +9,11 @@ wordpress_dir_structure:
   base:
     path: ''
   release:
-    path: '{{ wordpress_release }}'
+    path: '/{{ wordpress_release }}'
+  backup:
+    path: '/backup'
 
-    
-# logs:
-#    path: '/logs'
-# site:
-#    path: '/site'
+wordpress_backup_local_path: "{{ inventory_dir }}/../_private/backup"
 
 wordpress_default_admin_password: "{{ lookup('password', wordpress_dir_credentials + '/'+ wordpress_site_name + '.admin_password length=15')  }}"
 wordpress_default_db_password: "{{ lookup('password', wordpress_dir_credentials + '/' + wordpress_site_name + '.db_password length=25') }}"

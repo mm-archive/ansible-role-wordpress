@@ -38,7 +38,7 @@
     - wordpress_plugins
     
 - name: Configure Site with Nginx
-  inlude: 07-nginx.yml
+  include: 07-nginx.yml
   tags:
     - wordpress
     - wordpress_nginx
