@@ -1,0 +1,14 @@
+- name: Check Installation Status
+  command: >
+    wp core is-installed
+    --allow-root 
+  args:
+    chdir: "{{ wordpress_site_dir_www_root }}/{{ wordpress_site_name }}{{ wordpress_dir_structure.release.path }}"
+  register: wordpress_site_status
+  ignore_errors: true
+  changed_when: false
+  
+- name: Set Installation Flag
+  set_fact:
+    wordpress_installed: '{{ if wordpress_site_status.rc is defined and wordpress_site_status.rc == 1 true else false}}'
+  

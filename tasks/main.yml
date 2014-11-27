@@ -1,14 +1,24 @@
 ---
 # file: wordpress/tasks/main.yml
+
+- name: Check Installation Status
+  include: 00-check.yml
+  tags:
+    - wordpress
+    - wordprss_backup
+    - wordpress_deploy
+
 - name: Setup Base Directories
   include: 01-directories.yml
   tags:
     - wordpress
+    - wordpress_backup
+    - wordpress_deploy
     - wordpress_directories
-
 
 - name: Backup Wordpress
   include: 02-backup.yml
+  when: wordpress_installed
   tags:
     - wordpress
     - wordpress_backup
@@ -24,6 +34,13 @@
   tags:
     - wordpress
     - wordpress_deploy
+    
+- name: Re-Check Installation Status
+  include: 00-check.yml
+  tags:
+    - wordpress
+    - wordpress_install
+    - wordpress_plugins
 
 - name: Install or Update Wordpress
   include: 05-install.yml
@@ -33,6 +50,7 @@
     
 - name: Install or Update Wordpress Plugins
   include: 06-plugins.yml
+  when: wordpress_installed
   tags:
     - wordpress
     - wordpress_plugins

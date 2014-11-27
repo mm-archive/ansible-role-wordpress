@@ -2,5 +2,30 @@
 # file: wordpress/tasks/backup.yml
 
 - name: Backup Database
-  command: wp db export
+  command: >
+    wp db export    
+    {{ wordpress_site_dir_www_root }}/{{ wordpress_site_name }}{{ wordpress_dir_structure.backup.path }}/{{ wordpress_site_name }}.sql
+    --allow-root
     
+- name: Save SQL Backup Locally
+  fetch:
+    src: '{{ wordpress_site_dir_www_root }}/{{ wordpress_site_name }}{{ wordpress_dir_structure.backup.path }}/{{ wordpress_site_name }}.sql'
+    dest: '{{ wordpress_backup_local_path }}'
+    fail_on_missing: yes
+    flat: yes
+    
+- name: Get Uploads Dir
+  command: >
+    wp eval 
+    '$upload_dir = wp_upload_dir(); echo $upload_dir["basedir"]."\n";' 
+    --allow-root      
+  register: wordpress_uploads_dir
+  
+- name: Save Uploads locally
+  synchronize:
+    mode: pull
+    src: '{{ wordpress_uploads_dir.stdout }}'
+    dest: '{{ wordpress_backup_local_path }}/uploads'
+    archive: yes
+    delete: yes
+           

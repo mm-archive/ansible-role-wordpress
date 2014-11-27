@@ -14,6 +14,7 @@ wordpress_dir_structure:
     path: '/backup'
 
 wordpress_backup_local_path: "{{ inventory_dir }}/../_private/backup"
+wordpress_database_backup: "{{ wordpress_backup_local_path }}/{{ wordpress_site_name }}.sql"
 
 wordpress_default_admin_password: "{{ lookup('password', wordpress_dir_credentials + '/'+ wordpress_site_name + '.admin_password length=15')  }}"
 wordpress_default_db_password: "{{ lookup('password', wordpress_dir_credentials + '/' + wordpress_site_name + '.db_password length=25') }}"
@@ -42,8 +43,9 @@ wordpress_site_name: "{{ wordpress_site.name | default('Example') }}"
 wordpress_site_domain: "{{ wordpress_site.domain | default('example.test') }}"
 wordpress_site_alt_domains: "{{ wordpress_site.alt_domains | default([]) }}"
 wordpress_site_https: "{{ wordpress_site.https | default(false) }}"
-wordpress_site_repository: "{{ wordpress_site.repository | default('git@example.com:user/repo.git') }}"
-wordpress_site_repository_deploy_key: "{{ wordpress_site.repoistory_deploy_key | default('') }}"
+wordpress_site_repository: "{{ wordpress_site.repository | default('') }}"
+wordpress_site_repository_deploy_key: "{{ wordpress_site.repository_deploy_key | default('') }}"
+wordpress_site_repository_version: "{{ wordpress_site.repository_version | default ('HEAD') }}"
 wordpress_site_restore_saved_db: "{{ wordpress_site.restore_saved_db | default(false) }}"
 wordpress_site_install: "{{ wordpress_site.install | default(true) }}"
 wordpress_site_title: "{{ wordpress_site.title | default('Example Site') }}"

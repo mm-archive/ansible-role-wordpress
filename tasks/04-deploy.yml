@@ -1,12 +1,25 @@
-- name: Checkout site files
-  git: >
-    repo={{ wordpress_site_repository }}
-    dest={{ wordpress_site_dir_www_root }}/{{ wordpress_site_name }}
-    accept_hostkey=true
+---
+  
+- name: Copy Deploy Key
+  copy:
+    src: '{{ wordpress_site_repository_deploy_key }}'
+    dest: '/root/.ssh/.{{ wordpress_site_name}}_deploy_id_rsa'
+    mode: '0600'
+  when: wordpress_site_repository_deploy_key is defined and wordpress_site_repository_deploy_key != ''
 
+- name: Checkout site files
+  git: 
+    repo: '{{ wordpress_site_repository }}'
+    dest: '{{ wordpress_site_dir_www_root }}/{{ wordpress_site_name }}{{ wordpress_dir_structure.release.path }}'
+    accept_hostkey: true
+    version: '{{ wordpress_site_repository_version }}'
+    key_file: '/root/.ssh/.{{ wordpress_site_name}}_deploy_id_rsa'
+  when: wordpress_site_repository is defined and wordpress_site_repository != ''
+  
+# If repository is not set site files will need to copied manually or for exmaple mounted with vagrant
+  
 - name: Install Dependencies with Composer
-  composer: >
-    working_dir='{{ wordpress_site_dir_www_root }}/{{ wordpress_site_name }}'
+  composer:
+    working_dir: '{{ wordpress_site_dir_www_root }}/{{ wordpress_site_name }}{{ wordpress_dir_structure.release.path }}'
   when: wordpress_site_run_composer|bool
-  tags:
-    - wordpress
+  

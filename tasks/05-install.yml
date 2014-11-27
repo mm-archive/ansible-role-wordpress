@@ -2,20 +2,18 @@
   template: >
     src=.env
     dest={{ wordpress_site_dir_www_root }}/{{ wordpress_site_name }}/.env
-
-- name: WP installed?
+    
+- name: Download Wordpress
   command: >
-    wp core is-installed
-    --allow-root 
+    wp core download
+    --version={{ wordpress_site_wp_version }}
+    --allow-root
   args:
-    chdir: "{{ wordpress_site_dir_www_root }}/{{ wordpress_site_name }}"
-  register: wordpress_site_status
-  ignore_errors: True
-  changed_when: false
-  tags:
-    - wordpress
-
-- name: Install WP
+    chdir: "{{ wordpress_site_dir_www_root }}/{{ wordpress_site_name }}{{ wordpress_dir_structure.release.path }}"
+  register: wordpress_download
+  changed_when: wordpress_download.stdout contains 'Success:'
+  
+- name: Install Wordpress
   command: >
     wp core install
     --allow-root
@@ -25,26 +23,38 @@
     --admin_password='{{ wordpress_site_admin_password }}'
     --admin_email='{{ wordpress_site_admin_email }}'
   args:
-    chdir: "{{ wordpress_site_dir_www_root }}/{{ wordpress_site_name }}/"
-  when: wordpress_site_status.rc|int == 1 and wordpress_site_install|bool and not wordpress_site_multisite_enabled|bool
-  notify: Reload Nginx
-  tags:
-    - wordpress
-  
-- name: Install WP Multisite
+    chdir: "{{ wordpress_site_dir_www_root }}/{{ wordpress_site_name }}{{ wordpress_dir_structure.release.path }}"
+  when: not wordpress_installed
+    
+- name: Set Installation Flag
+  set_fact:
+    wordpress_installed: true
+
+- name: Get Installed Version
   command: >
-    wp core multisite-install
+    wp core version
     --allow-root
-    --url='{{ wordpress_site_home  }}'
-    --base='{{ wordpress_site_multisite_base_path }}'
-    --subdomains='{{ wordpress_site_multisite_subdomains }}'
-    --title='{{ wordpress_site_site_title }}'
-    --admin_user='{{ wordpress_site_admin_user }}'
-    --admin_password='{{ wordpress_site_admin_password }}'
-    --admin_email='{{ wordpress_site_admin_email }}'
   args:
-    chdir: "{{ wordpress_site_dir_www_root }}/{{ wordpress_site_name }}/current/"
-  when: wordpress_site_status.rc|int == 1 and wordpress_site_install|bool and wordpress_site_multisite_enabled|bool
-  notify: Reload Nginx
-  tags:
-    - wordpress
+    chdir: "{{ wordpress_site_dir_www_root }}/{{ wordpress_site_name }}{{ wordpress_dir_structure.release.path }}"
+  register: wordpress_installed_version
+
+- name: Update Wordpress
+  command: >
+    wp core update
+    --allow-root
+    --version={{ wordpress_site_wp_version }}
+  args:
+    chdir: "{{ wordpress_site_dir_www_root }}/{{ wordpress_site_name }}{{ wordpress_dir_structure.release.path }}"
+  when: wordpress_installed_versions.stdout != wordpress_site_wp_version
+  register: wordpress_updated
+  changed_when: wordpress_updated.stdout contains 'Success:'
+  
+- name: Update Wordpress DB
+  command: >
+    wp core update-db
+    --allow-root
+  args:
+    chdir: "{{ wordpress_site_dir_www_root }}/{{ wordpress_site_name }}{{ wordpress_dir_structure.release.path }}"
+  when: wordpress_updated|changed
+  
+  
