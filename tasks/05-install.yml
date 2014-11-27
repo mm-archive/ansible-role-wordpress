@@ -1,7 +1,4 @@
-- name: Generate environament variables file
-  template: >
-    src=.env
-    dest={{ wordpress_site_dir_www_root }}/{{ wordpress_site_name }}/.env
+---
     
 - name: Download Wordpress
   command: >
@@ -11,7 +8,8 @@
   args:
     chdir: "{{ wordpress_site_dir_www_root }}/{{ wordpress_site_name }}{{ wordpress_dir_structure.release.path }}"
   register: wordpress_download
-  changed_when: wordpress_download.stdout contains 'Success:'
+  changed_when: wordpress_download.stdout.find('Success:') != -1
+  failed_when: "wordpress_download.stderr !='' and 'Error: WordPress files seem to already be present here.' not in wordpress_download.stderr"
   
 - name: Install Wordpress
   command: >
@@ -24,7 +22,7 @@
     --admin_email='{{ wordpress_site_admin_email }}'
   args:
     chdir: "{{ wordpress_site_dir_www_root }}/{{ wordpress_site_name }}{{ wordpress_dir_structure.release.path }}"
-  when: not wordpress_installed
+  when: not wordpress_installed|bool
     
 - name: Set Installation Flag
   set_fact:
@@ -37,6 +35,7 @@
   args:
     chdir: "{{ wordpress_site_dir_www_root }}/{{ wordpress_site_name }}{{ wordpress_dir_structure.release.path }}"
   register: wordpress_installed_version
+  changed_when: false
 
 - name: Update Wordpress
   command: >
@@ -45,9 +44,9 @@
     --version={{ wordpress_site_wp_version }}
   args:
     chdir: "{{ wordpress_site_dir_www_root }}/{{ wordpress_site_name }}{{ wordpress_dir_structure.release.path }}"
-  when: wordpress_installed_versions.stdout != wordpress_site_wp_version
+  when: wordpress_installed_version.stdout != wordpress_site_wp_version
   register: wordpress_updated
-  changed_when: wordpress_updated.stdout contains 'Success:'
+  changed_when: wordpress_updated.stdout.find('Success:') != -1
   
 - name: Update Wordpress DB
   command: >

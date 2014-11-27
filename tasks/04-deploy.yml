@@ -23,3 +23,7 @@
     working_dir: '{{ wordpress_site_dir_www_root }}/{{ wordpress_site_name }}{{ wordpress_dir_structure.release.path }}'
   when: wordpress_site_run_composer|bool
   
+- name: Generate environament variables file
+  template:
+    src: .env
+    dest: '{{ wordpress_site_dir_www_root }}/{{ wordpress_site_name }}{{ wordpress_dir_structure.release.path }}/.env'

@@ -74,4 +74,5 @@ wordpress_site_https: "{{ wordpress_site.https | default(false) }}"
 wordpress_site_url_scheme: "{{ 'https://' if wordpress_site_https else 'http://' }}"
 wordpress_site_public_key: "{{ wordpress_site.public_key | default('**key**') }}"
 wordpress_site_private_key: "{{ wordpress_site.private_key | default('**key**') }}"
+wordpress_site_wp_version: "{{ wordpress_site.wp_version | default('4.0.1') }}"
 

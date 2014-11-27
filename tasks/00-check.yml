@@ -10,5 +10,6 @@
   
 - name: Set Installation Flag
   set_fact:
-    wordpress_installed: '{{ if wordpress_site_status.rc is defined and wordpress_site_status.rc == 1 true else false}}'
+    wordpress_installed: '{{ true if wordpress_site_status.rc is defined and wordpress_site_status.rc == 0 else false}}'
   
+- debug: var='wordpress_installed'
