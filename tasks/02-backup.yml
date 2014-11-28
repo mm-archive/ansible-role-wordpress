@@ -34,6 +34,6 @@
   synchronize:
     mode: pull
     src: '{{ wordpress_uploads_dir.stdout }}'
-    dest: '{{ wordpress_backup_local_path }}/uploads'
+    dest: '{{ wordpress_backup_local_path }}'
     archive: yes
     delete: yes
