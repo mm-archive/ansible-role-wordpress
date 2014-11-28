@@ -1,1 +1,37 @@
-- fail: msg="testing"
+- name: Install Plugins 
+  command: >
+    wp plugin install
+    {{ item.name }}
+    --version={{ item.version }}
+    --allow-root
+  args:
+    chdir: "{{ wordpress_site_dir_www_root }}/{{ wordpress_site_name }}{{ wordpress_dir_structure.release.path }}"
+  register: wordpress_plugins_downloaded
+  changed_when: wordpress_plugins_downloaded.stdout.find('Success:') != -1
+  failed_when: "wordpress_plugins_downloaded.stderr !='' and 'Error:' in wordpress_plugins_downloaded.stderr"
+  with_items: wordpress_site_plugins
+
+- name: Update Plugins
+  command: >
+    wp plugin update
+    {{ item.name }}
+    --version={{ item.version }}
+    --allow-root
+  args:
+    chdir: "{{ wordpress_site_dir_www_root }}/{{ wordpress_site_name }}{{ wordpress_dir_structure.release.path }}"
+  register: wordpress_plugins_updated
+  changed_when: 'wordpress_plugins_updated.stdout.find("Success: Updated 1/1 plugins.") != -1'
+  with_items: wordpress_site_plugins
+  
+- name: Activate Plugins
+  command: >
+    wp plugin activate
+    {{ item.name }}
+    --version={{ item.version }}
+    --allow-root
+  args:
+    chdir: "{{ wordpress_site_dir_www_root }}/{{ wordpress_site_name }}{{ wordpress_dir_structure.release.path }}"
+  register: wordpress_plugins_activated
+  changed_when: wordpress_plugins_activated.stdout.find('Success:') != -1
+  failed_when: "wordpress_plugins_activated.stderr !='' and 'Error:' in wordpress_plugins_activated.stderr"
+  with_items: wordpress_site_plugins
