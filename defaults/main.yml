@@ -1,35 +1,21 @@
 ---
 # file: wordpress/defaults/main.yml
-test: '{{ wordpress_site_multisite_enabled and wordpress_site_install }}'
-
 wordpress_dir_credentials: "{{ inventory_dir }}/../_private/credentials"
 
-
+wordpress_release: current
 # If we want to move the app files down a level
 # and other site folder (eg. /logs)
 wordpress_dir_structure:
   base:
     path: ''
-  web_root:
-    path: '/public'
-  app_root:
-    path: '/public/app'
-  mupligins:
-    path: '/public/app/mu-plugins'
-  plugins:
-    path: '/public/app/plugins'
-  themes: 
-    path: '/public/app/themes'
-  uploads:
-    path: '/public/app/uploads'
-  config:
-    path: '/config'
+  release:
+    path: '/{{ wordpress_release }}'
+  backup:
+    path: '/backup'
 
-    
-# logs:
-#    path: '/logs'
-# site:
-#    path: '/site'
+wordpress_backup: true
+wordpress_backup_local_path: "{{ inventory_dir }}/../_private/backup"
+wordpress_database_backup: "{{ wordpress_backup_local_path }}/{{ wordpress_site_name }}.sql"
 
 wordpress_default_admin_password: "{{ lookup('password', wordpress_dir_credentials + '/'+ wordpress_site_name + '.admin_password length=15')  }}"
 wordpress_default_db_password: "{{ lookup('password', wordpress_dir_credentials + '/' + wordpress_site_name + '.db_password length=25') }}"
@@ -58,8 +44,9 @@ wordpress_site_name: "{{ wordpress_site.name | default('Example') }}"
 wordpress_site_domain: "{{ wordpress_site.domain | default('example.test') }}"
 wordpress_site_alt_domains: "{{ wordpress_site.alt_domains | default([]) }}"
 wordpress_site_https: "{{ wordpress_site.https | default(false) }}"
-wordpress_site_repository: "{{ wordpress_site.repository | default('git@example.com:user/repo.git') }}"
-wordpress_site_repository_deploy_key: "{{ wordpress_site.repoistory_deploy_key | default('') }}"
+wordpress_site_repository: "{{ wordpress_site.repository | default('') }}"
+wordpress_site_repository_deploy_key: "{{ wordpress_site.repository_deploy_key | default('') }}"
+wordpress_site_repository_version: "{{ wordpress_site.repository_version | default ('HEAD') }}"
 wordpress_site_restore_saved_db: "{{ wordpress_site.restore_saved_db | default(false) }}"
 wordpress_site_install: "{{ wordpress_site.install | default(true) }}"
 wordpress_site_title: "{{ wordpress_site.title | default('Example Site') }}"
@@ -88,4 +75,8 @@ wordpress_site_https: "{{ wordpress_site.https | default(false) }}"
 wordpress_site_url_scheme: "{{ 'https://' if wordpress_site_https else 'http://' }}"
 wordpress_site_public_key: "{{ wordpress_site.public_key | default('**key**') }}"
 wordpress_site_private_key: "{{ wordpress_site.private_key | default('**key**') }}"
+wordpress_site_wp_version: "{{ wordpress_site.wp_version | default('4.0.1') }}"
+wordpress_site_plugins: "{{ wordpress_site.plugins | default([]) }}"
+
+ufw_override_web: false
 

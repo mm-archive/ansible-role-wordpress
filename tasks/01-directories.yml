@@ -1,0 +1,12 @@
+---
+# file: wordpress/tasks/directories.yml
+
+- name: Create directory structure
+  file: >
+    path={{ wordpress_site_dir_www_root }}/{{ wordpress_site_name }}{{ item.value.path }}
+    owner={{ wordpress_site_user_www }}
+    group={{ wordpress_site_group_www }}
+    mode={{ wordpress_site_dir_mode }}
+    state=directory
+  with_dict: wordpress_dir_structure
+  

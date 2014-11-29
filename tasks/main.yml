@@ -1,90 +1,72 @@
 ---
 # file: wordpress/tasks/main.yml
 
-- include: database.yml
-- include: dir_setup.yml
-- include: nginx.yml
-
-- name: Install Dependencies with Composer
-  composer: >
-    working_dir='{{ wordpress_site_dir_www_root }}/{{ wordpress_site_name }}'
-  when: wordpress_site_run_composer|bool
+- name: Check Installation Status
+  include: 00-check.yml
   tags:
     - wordpress
+    - wordpress_backup
+    - wordpress_deploy
 
-- name: WP installed?
-  command: >
-    wp core is-installed
-    --allow-root 
-  args:
-    chdir: "{{ wordpress_site_dir_www_root }}/{{ wordpress_site_name }}"
-  register: wordpress_site_status
-  ignore_errors: True
-  changed_when: false
+- name: Setup Base Directories
+  include: 01-directories.yml
   tags:
     - wordpress
+    - wordpress_backup
+    - wordpress_deploy
+    - wordpress_directories
 
-- name: Install WP
-  command: >
-    wp core install
-    --allow-root
-    --url='{{ wordpress_site_home }}'
-    --title='{{ wordpress_site_title }}'
-    --admin_user='{{ wordpress_site_admin_user }}'
-    --admin_password='{{ wordpress_site_admin_password }}'
-    --admin_email='{{ wordpress_site_admin_email }}'
-  args:
-    chdir: "{{ wordpress_site_dir_www_root }}/{{ wordpress_site_name }}/"
-  when: wordpress_site_status.rc|int == 1 and wordpress_site_install|bool and not wordpress_site_multisite_enabled|bool
-  notify: Reload Nginx
+- name: Backup Wordpress
+  include: 02-backup.yml
+  when: wordpress_installed and wordpress_backup
   tags:
     - wordpress
+    - wordpress_backup
+    
+- name: Create or Restore Site Database
+  include: 03-database.yml
+  tags:
+    - wordpress
+    - wordpress_database
   
-- name: Install WP Multisite
-  command: >
-    wp core multisite-install
-    --allow-root
-    --url='{{ wordpress_site_home  }}'
-    --base='{{ wordpress_site_multisite_base_path }}'
-    --subdomains='{{ wordpress_site_multisite_subdomains }}'
-    --title='{{ wordpress_site_site_title }}'
-    --admin_user='{{ wordpress_site_admin_user }}'
-    --admin_password='{{ wordpress_site_admin_password }}'
-    --admin_email='{{ wordpress_site_admin_email }}'
-  args:
-    chdir: "{{ wordpress_site_dir_www_root }}/{{ wordpress_site_name }}/current/"
-  when: wordpress_site_status.rc|int == 1 and wordpress_site_install|bool and wordpress_site_multisite_enabled|bool
-  notify: Reload Nginx
+- name: Deploy Site Source Files
+  include: 04-deploy.yml
   tags:
     - wordpress
+    - wordpress_deploy
+    
+- name: Re-Check Installation Status
+  include: 00-check.yml
+  tags:
+    - wordpress
+    - wordpress_install
+    - wordpress_plugins
 
-- name: Setup system cron
-  cron: >
-    name='{{ wordpress_site_name }} WordPress cron'
-    minute='*/15'
-    user='{{ wordpress_site_user_www }}'
-    job='curl -s {{ wordpress_site_url }}/wp-cron.php'
-    cron_file='wordpress_{{ wordpress_site_name }}'
-  when: wordpress_site_system_cron|bool
+- name: Install or Update Wordpress
+  include: 05-install.yml
+  tags: 
+    - wordpress
+    - wordpress_install
+    
+- name: Install or Update Wordpress Plugins
+  include: 06-plugins.yml
+  when: wordpress_installed
   tags:
     - wordpress
-  
-- name: Forward Email for user
-  lineinfile: >
-    dest=/etc/aliases
-    regexp='^{{ wordpress_site_user_www }}:'
-    line='{{ wordpress_site_user_www }}: {{ wordpress_site_forward_address }}'
-  when: wordpress_site_forward_system_mail|bool
-  notify: Newaliases
+    - wordpress_plugins
+    
+- name: Configure Site with Nginx
+  include: 07-nginx.yml
   tags:
     - wordpress
+    - wordpress_nginx
 
-- name: Remove forwarding
-  lineinfile: >
-    dest=/etc/aliases
-    regexp='^{{ wordpress_site_user_www }}:'
-    state='absent'
-  when: not wordpress_site_forward_system_mail|bool
-  notify: Newaliases  
+- name: Configure System Settings
+  include: 08-system.yml
   tags:
     - wordpress
+    - wordpress_system
+
+
+
+
