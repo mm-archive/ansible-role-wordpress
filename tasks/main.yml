@@ -5,7 +5,7 @@
   include: 00-check.yml
   tags:
     - wordpress
-    - wordprss_backup
+    - wordpress_backup
     - wordpress_deploy
 
 - name: Setup Base Directories
