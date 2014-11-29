@@ -10,7 +10,7 @@
 
 - name: Copy saved database to server
   copy: >
-    src={{ wordpress_site_name }}.sql
+    src={{ wordpress_database_backup }}
     dest=/tmp/{{ wordpress_site_name }}.sql
   when: wordpress_site_restore_saved_db|bool
 

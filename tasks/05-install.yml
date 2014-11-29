@@ -1,0 +1,59 @@
+---
+    
+- name: Download Wordpress
+  command: >
+    wp core download
+    --version={{ wordpress_site_wp_version }}
+    --allow-root
+  args:
+    chdir: "{{ wordpress_site_dir_www_root }}/{{ wordpress_site_name }}{{ wordpress_dir_structure.release.path }}"
+  register: wordpress_download
+  changed_when: wordpress_download.stdout.find('Success:') != -1
+  failed_when: "wordpress_download.stderr !='' and 'Error: WordPress files seem to already be present here.' not in wordpress_download.stderr"
+  
+- name: Install Wordpress
+  command: >
+    wp core install
+    --allow-root
+    --url='{{ wordpress_site_home }}'
+    --title='{{ wordpress_site_title }}'
+    --admin_user='{{ wordpress_site_admin_user }}'
+    --admin_password='{{ wordpress_site_admin_password }}'
+    --admin_email='{{ wordpress_site_admin_email }}'
+  args:
+    chdir: "{{ wordpress_site_dir_www_root }}/{{ wordpress_site_name }}{{ wordpress_dir_structure.release.path }}"
+  when: not wordpress_installed|bool
+    
+- name: Set Installation Flag
+  set_fact:
+    wordpress_installed: true
+
+- name: Get Installed Version
+  command: >
+    wp core version
+    --allow-root
+  args:
+    chdir: "{{ wordpress_site_dir_www_root }}/{{ wordpress_site_name }}{{ wordpress_dir_structure.release.path }}"
+  register: wordpress_installed_version
+  changed_when: false
+
+- name: Update Wordpress
+  command: >
+    wp core update
+    --allow-root
+    --version={{ wordpress_site_wp_version }}
+  args:
+    chdir: "{{ wordpress_site_dir_www_root }}/{{ wordpress_site_name }}{{ wordpress_dir_structure.release.path }}"
+  when: wordpress_installed_version.stdout != wordpress_site_wp_version
+  register: wordpress_updated
+  changed_when: wordpress_updated.stdout.find('Success:') != -1
+  
+- name: Update Wordpress DB
+  command: >
+    wp core update-db
+    --allow-root
+  args:
+    chdir: "{{ wordpress_site_dir_www_root }}/{{ wordpress_site_name }}{{ wordpress_dir_structure.release.path }}"
+  when: wordpress_updated|changed
+  
+  

@@ -1,0 +1,39 @@
+---
+# file: wordpress/tasks/backup.yml
+
+- name: Get timestamp
+  command: date +%Y%m%d%H%M%S
+  register: wordpress_backup_timestamp
+  changed_when: false
+
+- name: Backup Database
+  command: >
+    wp db export    
+    {{ wordpress_site_dir_www_root }}/{{ wordpress_site_name }}{{ wordpress_dir_structure.backup.path }}/{{ wordpress_site_name }}-{{ wordpress_backup_timestamp.stdout }}.sql
+    --allow-root
+  args:
+    chdir: "{{ wordpress_site_dir_www_root }}/{{ wordpress_site_name }}{{ wordpress_dir_structure.release.path }}"
+    
+- name: Save SQL Backup Locally
+  fetch:
+    src: '{{ wordpress_site_dir_www_root }}/{{ wordpress_site_name }}{{ wordpress_dir_structure.backup.path }}/{{ wordpress_site_name }}-{{ wordpress_backup_timestamp.stdout }}.sql'
+    dest: '{{ wordpress_backup_local_path }}/{{ wordpress_site_name }}-{{ wordpress_backup_timestamp.stdout }}.sql'
+    fail_on_missing: yes
+    flat: yes
+    
+- name: Get Uploads Dir
+  command: >
+    wp eval 
+    '$upload_dir = wp_upload_dir(); echo $upload_dir["basedir"]."\n";' 
+    --allow-root      
+  register: wordpress_uploads_dir
+  args:
+    chdir: "{{ wordpress_site_dir_www_root }}/{{ wordpress_site_name }}{{ wordpress_dir_structure.release.path }}"
+  
+- name: Save Uploads locally
+  synchronize:
+    mode: pull
+    src: '{{ wordpress_uploads_dir.stdout }}'
+    dest: '{{ wordpress_backup_local_path }}'
+    archive: yes
+    delete: yes
