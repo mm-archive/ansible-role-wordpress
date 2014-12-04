@@ -1,21 +1,17 @@
 ---
 # file: wordpress/meta/main.yml
 
-dependencies:
-  - MatthewMi11er.nginx
-  - MatthewMi11er.php
-  - MatthewMi11er.mariadb
-  - MatthewMi11er.wpcli
-version: 0.9.0
 galaxy_info:
   author: Matthew Miller
   description: A role to setup wordpress
   company: 
   license: license (MIT)
-  min_ansible_version: 1.6
+  min_ansible_version: 1.7.2
   platforms:
     - name: Ubuntu
       versions:
         - trusty
   categories:
     - web
+dependencies: []
+
