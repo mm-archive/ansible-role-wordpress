@@ -6,8 +6,6 @@
     job='curl -s {{ wordpress_site_url }}/wp-cron.php'
     cron_file='wordpress_{{ wordpress_site_name }}'
   when: wordpress_site_system_cron|bool
-  tags:
-    - wordpress
   
 - name: Forward Email for user
   lineinfile: >
@@ -16,8 +14,7 @@
     line='{{ wordpress_site_user_www }}: {{ wordpress_site_forward_address }}'
   when: wordpress_site_forward_system_mail|bool
   notify: Newaliases
-  tags:
-    - wordpress
+
 
 - name: Remove forwarding
   lineinfile: >
@@ -26,5 +23,3 @@
     state='absent'
   when: not wordpress_site_forward_system_mail|bool
   notify: Newaliases  
-  tags:
-    - wordpress
