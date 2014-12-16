@@ -78,5 +78,4 @@ wordpress_site_private_key: "{{ wordpress_site.private_key | default('**key**') 
 wordpress_site_wp_version: "{{ wordpress_site.wp_version | default('4.0.1') }}"
 wordpress_site_plugins: "{{ wordpress_site.plugins | default([]) }}"
 
-ufw_override_web: false
 
