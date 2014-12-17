@@ -1,6 +1,6 @@
 ---
 # file: wordpress/defaults/main.yml
-wordpress_dir_credentials: "{{ inventory_dir }}/../_private/credentials"
+wordpress_dir_credentials: "{{ playbook_dir }}/_private/credentials"
 
 wordpress_release: current
 # If we want to move the app files down a level
