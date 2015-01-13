@@ -18,7 +18,7 @@
 
 - name: Backup Wordpress
   include: 02-backup.yml
-  when: wordpress_installed and wordpress_backup
+  when: wordpress_installed|bool and wordpress_backup|bool
   tags:
     - wordpress
     - wordpress_backup

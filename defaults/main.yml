@@ -1,6 +1,6 @@
 ---
 # file: wordpress/defaults/main.yml
-wordpress_dir_credentials: "{{ inventory_dir }}/../_private/credentials"
+wordpress_dir_credentials: "{{ playbook_dir }}/_private/credentials"
 
 wordpress_release: current
 # If we want to move the app files down a level
@@ -13,8 +13,8 @@ wordpress_dir_structure:
   backup:
     path: '/backup'
 
-wordpress_backup: true
-wordpress_backup_local_path: "{{ inventory_dir }}/../_private/backup"
+wordpress_backup: false
+wordpress_backup_local_path: "{{ playbook_dir }}/_private/backup"
 wordpress_database_backup: "{{ wordpress_backup_local_path }}/{{ wordpress_site_name }}.sql"
 
 wordpress_default_admin_password: "{{ lookup('password', wordpress_dir_credentials + '/'+ wordpress_site_name + '.admin_password length=15')  }}"
@@ -55,7 +55,6 @@ wordpress_site_admin_password: "{{ wordpress_site.admin_password | default(wordp
 wordpress_site_admin_email: "{{ wordpress_site.admin_email | default('webmaster@example.test') }}"
 wordpress_site_system_cron: "{{ wordpress_site.system_cron | default(true) }}"
 wordpress_site_run_composer: "{{ wordpress_site.run_composer | default(true) }}"
-wordpress_site_multisite_enabled: "{{ wordpress_site.multisite_enabled | default(false) }}"
 wordpress_site_home: "{{ wordpress_site.home | default(wordpress_site_url_scheme+wordpress_site_domain) }}"
 wordpress_site_url: "{{ wordpress_site.url | default(wordpress_site_url_scheme+wordpress_site_domain+'/wp') }}"
 wordpress_site_env: "{{ wordpress_site.env | default('development') }}"
@@ -78,5 +77,4 @@ wordpress_site_private_key: "{{ wordpress_site.private_key | default('**key**') 
 wordpress_site_wp_version: "{{ wordpress_site.wp_version | default('4.0.1') }}"
 wordpress_site_plugins: "{{ wordpress_site.plugins | default([]) }}"
 
-ufw_override_web: false
 
