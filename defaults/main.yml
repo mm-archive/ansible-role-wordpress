@@ -13,7 +13,7 @@ wordpress_dir_structure:
   backup:
     path: '/backup'
 
-wordpress_backup: true
+wordpress_backup: false
 wordpress_backup_local_path: "{{ playbook_dir }}/_private/backup"
 wordpress_database_backup: "{{ wordpress_backup_local_path }}/{{ wordpress_site_name }}.sql"
 
